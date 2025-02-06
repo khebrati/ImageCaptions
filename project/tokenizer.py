@@ -20,3 +20,8 @@ def create_tokenizer(discriptions):
     with open('tokenizer.p', 'wb') as file:
         dump(tokenizer, file)
 
+def max_length(discriptions):
+    captions = list(discriptions.values())
+    # Calculate the maximum number of words
+    max_words = max(len(caption.split()) for caption in captions)
+    return max_words
