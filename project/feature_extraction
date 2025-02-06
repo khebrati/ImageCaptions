@@ -11,23 +11,24 @@ def extract_features(directory, batch_size=32):
     Features of each image are vectors with 2048 elements.
     """
     model = Xception(weights='imagenet', include_top=False, pooling='avg')
-    preprocessed_input = {}
-    features = {}
+    images = []
+    filenames = []
     for filename in os.listdir(directory):
         img_path = os.path.join(directory, filename)
         img = load_img(img_path, target_size=(299, 299))
         x = img_to_array(img)
         x = preprocess_input(x)
-        preprocessed_input[filename] = x
-        # feature = model.predict(x)
-        # features[filename] = feature.flatten()
-    features = model.__call__(preprocessed_input)
-    return features
+        images.append(x)
+        filenames.append(filename)
+    images_arr = np.stack(images)
+    dataset = tf.data.Dataset.from_tensor_slices(images_arr).batch(batch_size)
+    features = model.predict(dataset,verbose="2")
+    # Return a mapping from filename to corresponding feature vector.
+    return dict(zip(filenames, features))
 
 if __name__ == '__main__':
-    features = extract_features('images')
+    features = extract_features('Images')
     with open('features.p', 'wb') as f:
         pickle.dump(features, f)
-    with open('features.p', 'rb') as f:
-        loaded_features = pickle.load(f)
-    print("Features extracted and loaded successfully.")
+    print("Features extracted successfully.")
+    
