@@ -1,4 +1,5 @@
-import string
+# import string
+from pickle import dump, load
 
 def load_photos(filename):
     with open(filename, 'r') as file:
@@ -39,3 +40,15 @@ def load_clean_descriptions(filename, photos):
     with open(filename, 'w') as file:
         file.writelines(filtered_line)
     
+def load_features(photos):
+    # Path to .p file
+    file_path = 'features.p'
+
+    # Load the dictionary from the .p file
+    with open(file_path, 'rb') as file:
+        data = load(file)
+    
+    # Use dictionary comprehension to filter the dictionary
+    filtered_dict = {key: value for key, value in data.items() if key in photos}
+    
+    return filtered_dict
