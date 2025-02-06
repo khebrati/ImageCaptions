@@ -1,13 +1,14 @@
 import os
 import pickle
 import numpy as np
+import tensorflow as tf
 from keras.api.applications.xception import Xception, preprocess_input
 from keras.api.preprocessing.image import load_img, img_to_array
 
-def extract_features(directory):
+def extract_features(directory, batch_size=32):
     """
-    Use the Xception model to extract image features in this directory.
-    Features of each image is a vector with 2048 elements.
+    Use the Xception model to extract image features in a given directory.
+    Features of each image are vectors with 2048 elements.
     """
     model = Xception(weights='imagenet', include_top=False, pooling='avg')
     preprocessed_input = {}
@@ -16,12 +17,11 @@ def extract_features(directory):
         img_path = os.path.join(directory, filename)
         img = load_img(img_path, target_size=(299, 299))
         x = img_to_array(img)
-        # x = np.expand_dims(x, axis=0)
         x = preprocess_input(x)
         preprocessed_input[filename] = x
         # feature = model.predict(x)
         # features[filename] = feature.flatten()
-    features = model.predict(preprocessed_input)
+    features = model.__call__(preprocessed_input)
     return features
 
 if __name__ == '__main__':
